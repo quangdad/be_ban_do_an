@@ -5,7 +5,6 @@ const CryptoJS = require("crypto-js");
 module.exports = {
   update: (req, res) => {
     const { _id, phone, password } = req.body;
-    console.log(req.body);
     co(function* () {
       const isExistsPhone = yield User.findOne({ phone: phone }).select(
         "phone"
@@ -61,8 +60,9 @@ module.exports = {
   },
   get: (req, res) => {
     co(function* () {
-      const { id } = req.params;
-      const user = yield User.findById({ _id: id });
+      const user = yield User.findById(req.params.id).select(
+        "-password -createdAt -updatedAt"
+      );
       return user;
     })
       .then((data) => res.status(200).json(data))

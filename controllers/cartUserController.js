@@ -1,5 +1,6 @@
 const co = require("co");
 const Cart = require("../models/cartModel");
+const userModel = require("../models/userModel");
 
 module.exports = {
   gets: (req, res) => {
@@ -26,7 +27,6 @@ module.exports = {
 
   create: (req, res) => {
     co(function* () {
-      console.log(req.body);
       const checkUser = yield Cart.findOne({ UID: req.body.UID });
       if (!checkUser) {
         return yield Cart.create(req.body);
@@ -45,17 +45,13 @@ module.exports = {
 
   update: (req, res) => {
     co(function* () {
-      const checkOrder = yield Cart.findById(req.params.id);
-      if (!checkOrder) {
-        return yield Promise.reject(new Error("Not found"));
-      }
       const order = yield Cart.findOneAndUpdate(
         { _id: req.body.id, "cart._id": req.body.cartId },
+        { $set: { "cart.$.status": req.body.status } },
         {
-          $set: { "cart.$.status": req.body.status },
+          new: true,
         }
       );
-      console.log(order);
       return order;
     })
       .then((data) => res.status(200).json(data))
@@ -73,10 +69,11 @@ module.exports = {
 
   getOrderByUID: (req, res) => {
     co(function* () {
-      const orders = yield Cart.find({ UID: req.params.UID });
-      if (!orders) {
-        return yield Promise.reject(new Error("Not found"));
+      const isUser = yield userModel.findById(req.params.UID);
+      if (!isUser) {
+        return yield Promise.reject(new Error("User Not found"));
       }
+      const orders = yield Cart.find({ UID: req.params.UID });
 
       return orders;
     })

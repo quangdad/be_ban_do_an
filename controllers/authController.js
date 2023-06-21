@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 module.exports = {
   signup: (req, res) => {
     const { phone, password } = req.body;
-    console.log(req.body);
     co(function* () {
       const userExisted = yield User.findOne({ phone });
       if (userExisted) {
@@ -32,7 +31,6 @@ module.exports = {
   },
 
   signin: async (req, res) => {
-    console.log(req.body);
     const { username, password } = req.body;
     try {
       const user = await User.findOne({ username });
