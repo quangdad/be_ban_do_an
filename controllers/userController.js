@@ -61,7 +61,7 @@ module.exports = {
   get: (req, res) => {
     co(function* () {
       const user = yield User.findById(req.params.id).select(
-        "-password -createdAt -updatedAt"
+        " -createdAt -updatedAt"
       );
       return user;
     })
